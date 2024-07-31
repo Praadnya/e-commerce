@@ -9,7 +9,7 @@
 
 1. Clone the repository
 ```bash
-git clone 
+git clone https://github.com/Praadnya/e-commerce.git
 cd e-commerce
 ```
 2. Run the front-end
