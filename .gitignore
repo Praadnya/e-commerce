@@ -1,2 +1,3 @@
 e-commerce-server\app\__pycache__
 *.ttl
+e-commerce-frontend\node_modules
