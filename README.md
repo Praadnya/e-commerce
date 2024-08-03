@@ -12,15 +12,13 @@
 git clone https://github.com/Praadnya/e-commerce.git
 cd e-commerce
 ```
-2. Run the front-end
+2. Install packages and dependencies
 ```bash
-cd e-commerce-frontend
-npm i
-npm start
+./setup
 ```
-3. Run the server
+3. Run server and frontend
 ```bash
-cd e-commerce-server
-pip install -r requirements.txt
-uvicorn main:app --reload
+./run
 ```
+
+**NOTE:** The server runs on port `8000` and the frontend on `3000`
