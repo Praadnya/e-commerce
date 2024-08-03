@@ -3,6 +3,35 @@ from rdflib import Graph, Namespace, RDF
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from collections import defaultdict
+import numpy as np
+from scipy.spatial.distance import euclidean
+
+def jaccard_similarity(set1, set2):
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    return intersection / union
+
+def cosine_similarity(set1, set2):
+    # Create a combined set of elements
+    combined = list(set1.union(set2))
+    # Create vectors
+    vec1 = [1 if elem in set1 else 0 for elem in combined]
+    vec2 = [1 if elem in set2 else 0 for elem in combined]
+    # Calculate cosine similarity
+    dot_product = np.dot(vec1, vec2)
+    norm_a = np.linalg.norm(vec1)
+    norm_b = np.linalg.norm(vec2)
+    return dot_product / (norm_a * norm_b)
+
+def euclidean_distance(set1, set2):
+    # Create a combined set of elements
+    combined = list(set1.union(set2))
+    # Create vectors
+    vec1 = np.array([1 if elem in set1 else 0 for elem in combined])
+    vec2 = np.array([1 if elem in set2 else 0 for elem in combined])
+    # Calculate Euclidean distance
+    return euclidean(vec1, vec2)
+
 
 app = FastAPI()
 
@@ -23,11 +52,17 @@ def load_graph():
 @app.get("/classes")
 async def get_classes():
     query = """
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX owl: <http://www.w3.org/2002/07/owl#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
     SELECT ?class
     WHERE {
         ?class rdf:type owl:Class .
+        FILTER (STRSTARTS(STR(?class), "http://"))
         FILTER NOT EXISTS {
             ?subclass rdfs:subClassOf ?class .
+            FILTER (STRSTARTS(STR(?subclass), "http://"))
         }
     }
     """
@@ -86,16 +121,14 @@ async def get_similarity(request: SimilarityRequest):
     set1 = set((prop, val) for prop, vals in properties1.items() for val in vals)
     set2 = set((prop, val) for prop, vals in properties2.items() for val in vals)
 
-    # Calculate Jaccard similarity between the sets of properties
-    intersection = set1.intersection(set2)
-    union = set1.union(set2)
-    
-    if len(union) == 0:
-        similarity_score = 0.0
-    else:
-        similarity_score = len(intersection) / len(union)
 
-    return {"similarity_score": similarity_score}
+    similarity_scores = {
+        "jaccard_similarity": jaccard_similarity(set1, set2),
+        "cosine_similarity": cosine_similarity(set1, set2),
+        "euclidean_distance": euclidean_distance(set1, set2)
+    }
+
+    return similarity_scores
 
 
 def get_instance_properties(instance):

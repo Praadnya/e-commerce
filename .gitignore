@@ -1,3 +1,5 @@
 e-commerce-server\app\__pycache__
 *.ttl
 e-commerce-frontend\node_modules
+package_lock.json
+node_modules/

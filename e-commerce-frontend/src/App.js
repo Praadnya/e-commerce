@@ -18,7 +18,7 @@ const App = () => {
                     <OntologyDropdowns />
                 </div>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Ontology Similarity ©2024</Footer>
+            <Footer style={{ textAlign: 'center' }}>Ontology and Semantic Web - Summer Course 2024</Footer>
         </Layout>
     );
 };
